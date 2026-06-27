@@ -71,28 +71,28 @@ You can use a GitHub repository URL as the template source.
 Latest from default branch:
 
 ```bash
-copier copy --trust gh:OWNER/REPO my-new-project
+copier copy --trust gh:pszponder/copier-templates my-new-project
 
 # or
-uvx copier copy --trust gh:OWNER/REPO my-new-project
+uvx copier copy --trust gh:pszponder/copier-templates my-new-project
 ```
 
 From a tag:
 
 ```bash
-copier copy --trust -r v0.1.0 gh:OWNER/REPO my-new-project
+copier copy --trust -r v0.1.0 gh:pszponder/copier-templates my-new-project
 ```
 
 From a branch:
 
 ```bash
-copier copy --trust -r main gh:OWNER/REPO my-new-project
+copier copy --trust -r main gh:pszponder/copier-templates my-new-project
 ```
 
 From a commit SHA:
 
 ```bash
-copier copy --trust -r <commit-sha> gh:OWNER/REPO my-new-project
+copier copy --trust -r <commit-sha> gh:pszponder/copier-templates my-new-project
 ```
 
 Tip: tag releases so consumers can pin stable template versions.

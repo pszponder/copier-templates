@@ -4,7 +4,7 @@ _subdirectory: "{% if project_type == 'python' %}template/python/{{ python_flavo
 project_name:
   type: str
   help: "Human-friendly project name:"
-  placeholder: "Python Project"
+  placeholder: "Project Name"
   validator: "{% if not project_name %}Project name is required.{% endif %}"
 
 project_type:
