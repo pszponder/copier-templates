@@ -1,0 +1,63 @@
+[project]
+name = "{{ project_slug }}"
+version = "0.1.0"
+description = "{{ project_description }}"
+readme = "README.md"
+authors = [
+    { name = "{{ author_name }}", email = "{{ author_email }}" },
+]
+requires-python = ">={{ python_version }}"
+dependencies = [
+    "fastapi>=0.116.0,<1.0.0",
+    "uvicorn[standard]>=0.35.0,<1.0.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.11.19,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.15.20",
+    "ty>=0.0.55",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py{{ python_version | replace('.', '') }}"
+
+[tool.ruff.lint]
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ty.environment]
+root = ["./src"]
+
+[tool.ty.rules]
+all = "warn"
+
+[[tool.ty.overrides]]
+include = ["src/**"]
+
+[tool.ty.overrides.rules]
+possibly-unresolved-reference = "error"
+
+[tool.ty.terminal]
+error-on-warning = false
+output-format = "full"

@@ -1,0 +1,112 @@
+_min_copier_version: "9.0.0"
+_subdirectory: "{% if project_type == 'python' %}template/python/{{ python_flavor }}{% elif project_type == 'node' %}template/node/{{ node_flavor }}{% else %}template/go/{{ go_flavor }}{% endif %}"
+
+project_name:
+  type: str
+  help: "Human-friendly project name:"
+  placeholder: "Python Project"
+  validator: "{% if not project_name %}Project name is required.{% endif %}"
+
+project_type:
+  type: str
+  help: "Project type:"
+  choices:
+    Python: python
+    Node.js: node
+    Go: go
+  default: python
+
+python_flavor:
+  type: str
+  help: "Python template flavor:"
+  choices:
+    Base: base
+    FastAPI: fastapi
+  default: base
+  when: "{{ project_type == 'python' }}"
+
+node_flavor:
+  type: str
+  help: "Node.js template flavor:"
+  choices:
+    Base: base
+  default: base
+  when: "{{ project_type == 'node' }}"
+
+go_flavor:
+  type: str
+  help: "Go template flavor:"
+  choices:
+    Base: base
+  default: base
+  when: "{{ project_type == 'go' }}"
+
+project_slug:
+  type: str
+  help: "Kebab-case distribution and CLI name:"
+  default: "{{ project_name | lower | replace(' ', '-') }}"
+
+package_name:
+  type: str
+  help: "Python import package name:"
+  default: "{{ project_slug | replace('-', '_') }}"
+  when: "{{ project_type == 'python' }}"
+
+project_description:
+  type: str
+  help: "Short project description:"
+  placeholder: "Add your description here"
+  validator: "{% if not project_description %}Project description is required.{% endif %}"
+
+author_name:
+  type: str
+  help: "Author name:"
+  placeholder: "Your Name"
+  validator: "{% if not author_name %}Author name is required.{% endif %}"
+
+author_email:
+  type: str
+  help: "Author email:"
+  placeholder: "you@example.com"
+  validator: "{% if not author_email %}Author email is required.{% endif %}"
+
+python_version:
+  type: str
+  help: "Python version to pin in tooling (for example 3.14):"
+  default: "3.14"
+  when: "{{ project_type == 'python' }}"
+
+node_version:
+  type: str
+  help: "Node.js version to pin in tooling (for example 22):"
+  default: "22"
+  when: "{{ project_type == 'node' }}"
+
+go_version:
+  type: str
+  help: "Go version to pin in tooling (for example 1.22):"
+  default: "1.22"
+  when: "{{ project_type == 'go' }}"
+
+include_devcontainer:
+  type: bool
+  help: "Include a VS Code devcontainer configuration?"
+  default: true
+
+_exclude:
+  - ".git"
+  - ".venv"
+  - "__pycache__"
+  - "*.pyc"
+
+_tasks:
+  - "chmod +x scripts/setup || true"
+  - "{{ 'true' if include_devcontainer else 'rm -rf .devcontainer' }}"
+
+_message_after_copy: |
+  Project '{{ project_name }}' ({{ project_type }}) created.
+
+  Next steps:
+    1. cd {{ _copier_conf.dst_path }}
+    2. make sync
+    3. {% if project_type == 'python' and python_flavor == 'fastapi' %}make dev{% elif project_type == 'python' %}make check{% elif project_type == 'node' %}npm test{% else %}go test ./...{% endif %}

@@ -1,0 +1,10 @@
+{
+    "build": {
+        "context": "..",
+        "dockerfile": "Containerfile"
+    }{% if project_type == 'python' %},
+    "containerEnv": {
+        "UV_LINK_MODE": "copy"
+    }{% endif %},
+    "postCreateCommand": "scripts/setup"
+}

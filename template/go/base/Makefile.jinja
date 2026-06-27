@@ -1,0 +1,33 @@
+# ====================================================================
+# Go Project Makefile
+# ====================================================================
+
+.DEFAULT_GOAL := help
+
+.PHONY: \
+	help \
+	sync \
+	test \
+	run \
+	build \
+	clean
+
+help: ## Show this help message
+	@echo "Available commands:"
+	@echo
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+sync: ## Sync Go modules
+	go mod tidy
+
+test: ## Run test suite
+	go test ./...
+
+run: ## Run the application
+	go run .
+
+build: ## Build binary
+	go build ./...
+
+clean: ## Remove local build artifacts
+	rm -rf bin

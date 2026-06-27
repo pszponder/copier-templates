@@ -1,0 +1,33 @@
+# ====================================================================
+# Node.js Project Makefile
+# ====================================================================
+
+.DEFAULT_GOAL := help
+
+.PHONY: \
+	help \
+	sync \
+	test \
+	run \
+	build \
+	clean
+
+help: ## Show this help message
+	@echo "Available commands:"
+	@echo
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+sync: ## Install or update dependencies
+	npm install
+
+test: ## Run test suite
+	npm test
+
+run: ## Run the application
+	npm run start
+
+build: ## Build distribution (if script exists)
+	npm run build --if-present
+
+clean: ## Remove build artifacts and caches
+	rm -rf node_modules coverage dist build

@@ -1,0 +1,81 @@
+# ====================================================================
+# FastAPI Project Makefile
+# ====================================================================
+
+.DEFAULT_GOAL := help
+
+PACKAGE := {{ package_name }}
+APP_IMPORT := $(PACKAGE).main:app
+SRC := src
+
+.PHONY: \
+	help \
+	sync \
+	format \
+	format-check \
+	lint \
+	fix \
+	typecheck \
+	check \
+	test \
+	coverage \
+	run \
+	dev \
+	build \
+	clean
+
+help: ## Show this help message
+	@echo "Available commands:"
+	@echo
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+sync: ## Install or update dependencies
+	uv sync
+
+format: ## Format code with Ruff
+	uv run ruff format .
+
+format-check: ## Check code formatting without changes
+	uv run ruff format --check .
+
+lint: ## Run Ruff linter
+	uv run ruff check .
+
+typecheck: ## Run Ty type checker
+	uv run ty check
+
+fix: ## Fix all auto-fixable issues
+	uv run ruff check . --fix
+	uv run ruff format .
+
+check: lint typecheck test ## Run all quality checks
+
+test: ## Run test suite
+	uv run pytest
+
+coverage: ## Run tests with coverage
+	uv run pytest --cov=$(SRC)
+
+run: ## Run API server
+	uv run uvicorn $(APP_IMPORT) --host 0.0.0.0 --port 8000
+
+dev: ## Run API server with auto-reload
+	uv run uvicorn $(APP_IMPORT) --host 0.0.0.0 --port 8000 --reload
+
+build: ## Build wheel + sdist
+	uv build
+
+clean: ## Remove caches and build artifacts
+	rm -rf \
+		.pytest_cache \
+		.ruff_cache \
+		.mypy_cache \
+		.hypothesis \
+		.coverage \
+		htmlcov \
+		dist \
+		build \
+		.eggs \
+		*.egg-info \
+		*.egg
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true

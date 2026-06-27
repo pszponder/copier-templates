@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if command -v mise >/dev/null 2>&1; then
+  MISE_BIN="$(command -v mise)"
+elif [[ -x /usr/local/bin/mise ]]; then
+  MISE_BIN="/usr/local/bin/mise"
+else
+  echo "ERROR: mise not found in PATH and not found at /usr/local/bin/mise" >&2
+  exit 1
+fi
+
+WORKSPACE_DIR="${WORKSPACE_DIR:-${PWD}}"
+MISE_FILE="$WORKSPACE_DIR/mise.toml"
+
+if [[ -f "$MISE_FILE" ]]; then
+  "$MISE_BIN" trust "$MISE_FILE"
+  "$MISE_BIN" install
+else
+  echo "WARN: $MISE_FILE not found. Skipping mise install."
+fi
+
+if command -v zsh >/dev/null 2>&1; then
+  sudo chsh -s "$(command -v zsh)" "$USER" || true
+fi

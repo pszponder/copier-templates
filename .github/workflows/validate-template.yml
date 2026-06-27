@@ -1,0 +1,92 @@
+name: Validate Copier Template
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  render-check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: python-base-devcontainer
+            project_type: python
+            include_devcontainer: true
+            extra_data: "-d python_flavor=base -d package_name=python_base_app -d python_version=3.14"
+            expected_file: pyproject.toml
+          - name: python-base-no-devcontainer
+            project_type: python
+            include_devcontainer: false
+            extra_data: "-d python_flavor=base -d package_name=python_base_app -d python_version=3.14"
+            expected_file: pyproject.toml
+          - name: python-fastapi-devcontainer
+            project_type: python
+            include_devcontainer: true
+            extra_data: "-d python_flavor=fastapi -d package_name=python_fastapi_app -d python_version=3.14"
+            expected_file: src/python_fastapi_app/main.py
+          - name: python-fastapi-no-devcontainer
+            project_type: python
+            include_devcontainer: false
+            extra_data: "-d python_flavor=fastapi -d package_name=python_fastapi_app -d python_version=3.14"
+            expected_file: src/python_fastapi_app/main.py
+          - name: node-base-devcontainer
+            project_type: node
+            include_devcontainer: true
+            extra_data: "-d node_flavor=base -d node_version=22"
+            expected_file: package.json
+          - name: node-base-no-devcontainer
+            project_type: node
+            include_devcontainer: false
+            extra_data: "-d node_flavor=base -d node_version=22"
+            expected_file: package.json
+          - name: go-base-devcontainer
+            project_type: go
+            include_devcontainer: true
+            extra_data: "-d go_flavor=base -d go_version=1.22"
+            expected_file: go.mod
+          - name: go-base-no-devcontainer
+            project_type: go
+            include_devcontainer: false
+            extra_data: "-d go_flavor=base -d go_version=1.22"
+            expected_file: go.mod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Copier
+        run: pip install "copier>=9.0,<10.0"
+
+      - name: Render template (${{ matrix.name }})
+        shell: bash
+        run: |
+          set -euo pipefail
+          out_dir="$RUNNER_TEMP/${{ matrix.name }}"
+
+          copier copy --trust --defaults \
+            -d project_name="${{ matrix.name }}" \
+            -d project_type="${{ matrix.project_type }}" \
+            -d project_slug="${{ matrix.name }}" \
+            -d project_description="Template validation run" \
+            -d author_name="Template Bot" \
+            -d author_email="template-bot@example.com" \
+            -d include_devcontainer=${{ matrix.include_devcontainer }} \
+            ${{ matrix.extra_data }} \
+            . "$out_dir"
+
+          test -f "$out_dir/${{ matrix.expected_file }}"
+
+          if [[ "${{ matrix.include_devcontainer }}" == "true" ]]; then
+            test -d "$out_dir/.devcontainer"
+          else
+            test ! -d "$out_dir/.devcontainer"
+          fi
