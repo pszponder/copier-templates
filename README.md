@@ -1,10 +1,9 @@
 # Multi-Language Copier Template
 
-This repository can be used as a Copier template for new Python, Node.js, or Go projects.
+This repository contains [Copier](https://copier.readthedocs.io/en/stable/) template for new Python, Node.js, or Go projects.
 
 ## Prerequisites
 
-- Python 3.10+
 - Copier installed (one of the options below)
 
 Install options:
@@ -184,3 +183,6 @@ copier update --trust
 # or
 uvx copier update --trust
 ```
+
+## Resources / References
+- [Copier Documentation](https://copier.readthedocs.io/en/stable/)
